@@ -4,9 +4,11 @@
 #include <cstdint>
 #include <cstddef>
 #include <cassert>
+#include <exception>
 #include <iterator>
 
 #include <boost/endian/conversion.hpp>
+#include <fmt/format.h>
 #include <gsl/gsl>
 
 #include "codec_header.hpp"
@@ -18,7 +20,7 @@ namespace janucaria::mmtf
 template <typename TInIter,
           std::enable_if_t<is_iter_value_1byte_integral_v<TInIter>> * = nullptr>
 auto make_codec_header(TInIter iter, TInIter iter_end) noexcept
-  -> CodecHeader<std::add_const_t<typename std::iterator_traits<TInIter>::value_type>>
+    -> CodecHeader<std::add_const_t<typename std::iterator_traits<TInIter>::value_type>>
 {
   using DataByte = std::add_const_t<typename std::iterator_traits<TInIter>::value_type>;
 
@@ -50,6 +52,34 @@ template <typename TRange>
 auto make_codec_header(TRange &&range) noexcept -> decltype(auto)
 {
   return make_codec_header(std::cbegin(std::forward<TRange>(range)), std::cend(std::forward<TRange>(range)));
+}
+
+template <typename T>
+auto decode_header_type_1(CodecHeader<T> header) -> std::vector<float>
+{
+  if(header.strategy != 1) {
+    const auto message = fmt::format("Wrong strategy type, expected 1 got {}.", header.strategy);
+    throw std::invalid_argument{message};
+  }
+  
+  if (header.encoded_data.size() % 4 != 0)
+  {
+    const auto message = fmt::format("Data length {} is not a multiple of {}.", header.encoded_data.size(), 4);
+    throw std::invalid_argument{message};
+  }
+
+  auto output = std::vector<float>{};
+
+  const auto data_size = header.encoded_data.size() / 4;
+  const auto floats_view = gsl::span<const std::uint32_t>{reinterpret_cast<const std::uint32_t *>(header.encoded_data.data()), data_size};
+
+  output.reserve(data_size);
+  std::transform(std::cbegin(floats_view), std::cend(floats_view), std::back_inserter(output), [](auto val) noexcept {
+    const auto native_val = boost::endian::big_to_native(val);
+    return *reinterpret_cast<const float*>(&native_val);;
+  });
+
+  return output;
 }
 
 } // namespace janucaria::mmtf

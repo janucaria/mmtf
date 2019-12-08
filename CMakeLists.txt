@@ -3,6 +3,7 @@ project(mmtf)
 
 find_package(Boost 1.71 REQUIRED)
 find_package(Catch2 2.9 REQUIRED)
+find_package(fmt 6.1 REQUIRED)
 
 add_library(janucaria-mmtf INTERFACE)
 
@@ -28,6 +29,7 @@ target_compile_features(janucaria-mmtf
 target_link_libraries(janucaria-mmtf
   INTERFACE
     Boost::headers
+    fmt::fmt-header-only
 )
 
 add_subdirectory(test)

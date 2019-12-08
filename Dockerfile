@@ -126,4 +126,17 @@ RUN git clone -b v2.0.0 https://github.com/microsoft/GSL.git \
   && cd .. \
   && rm -rf GSL
 
+RUN git clone -b 6.1.1 https://github.com/fmtlib/fmt.git \
+  && cd fmt \
+  && mkdir build \
+  && cmake -H. -B./build \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DFMT_DOC=OFF \
+  -DFMT_INSTALL=ON \
+  -DFMT_TEST=OFF \
+  && cmake --build ./build --config Release --target all -- -j$(nproc) \
+  && cmake --build ./build --config Release --target install -- -j$(nproc) \
+  && cd .. \
+  && rm -rf fmt
+
 WORKDIR /app
