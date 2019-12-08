@@ -194,6 +194,42 @@ auto decode_header_type_5(CodecHeader<T> header) -> std::vector<std::string>
   return output;
 }
 
+template <typename T>
+auto decode_header_type_6(CodecHeader<T> header) -> std::vector<char>
+{
+  if (header.strategy != 6)
+  {
+    const auto message = fmt::format("Wrong strategy type, expected 6 got {}.", header.strategy);
+    throw std::invalid_argument{message};
+  }
+
+  if (header.encoded_data.size() % 4 != 0)
+  {
+    const auto message = fmt::format("Data length {} is not a multiple of {}.", header.encoded_data.size(), 4);
+    throw std::invalid_argument{message};
+  }
+
+  auto output = std::vector<char>{};
+
+  const auto data_size = header.encoded_data.size() / 4;
+  if (data_size % 2 != 0)
+  {
+    const auto message = "Data run length size is not even.";
+    throw std::invalid_argument{message};
+  }
+
+  const auto data_view = gsl::span<const std::int32_t>{reinterpret_cast<const std::int32_t *>(header.encoded_data.data()), data_size};
+
+  for (auto it = std::cbegin(data_view); it != std::cend(data_view); std::advance(it, 2))
+  {
+    const auto value = static_cast<char>(boost::endian::big_to_native(*it));
+    const auto count = boost::endian::big_to_native(*std::next(it));
+    std::fill_n(std::back_inserter(output), count, value);
+  }
+
+  return output;
+}
+
 } // namespace janucaria::mmtf
 
 #endif

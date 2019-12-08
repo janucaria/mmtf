@@ -176,3 +176,41 @@ SCENARIO("UTF8/ASCII fixed-length string array")
     }
   }
 }
+
+SCENARIO("Run-length encoded character array")
+{
+  GIVEN("Encoded data with strategy type 6")
+  {
+    const auto encoded = std::vector<char>{
+        // strategy
+        '\x00', '\x00', '\x00', '\x06',
+        // length
+        '\x00', '\x00', '\x00', '\x06',
+        // parameter
+        '\x00', '\x00', '\x00', '\x00',
+        // data
+        '\x00', '\x00', '\x00', 'A',
+        '\x00', '\x00', '\x00', '\x04',
+        '\x00', '\x00', '\x00', 'Z',
+        '\x00', '\x00', '\x00', '\x02',
+        '\x00', '\x00', '\x00', 'F',
+        '\x00', '\x00', '\x00', '\x00'};
+
+    WHEN("Decode code header")
+    {
+      const auto header = mmtf::make_codec_header(encoded);
+      const auto decoded = mmtf::decode_header_type_6(header);
+
+      THEN("Get decoded data")
+      {
+        REQUIRE(decoded.size() == 6);
+        REQUIRE(decoded[0] == 'A');
+        REQUIRE(decoded[1] == 'A');
+        REQUIRE(decoded[2] == 'A');
+        REQUIRE(decoded[3] == 'A');
+        REQUIRE(decoded[4] == 'Z');
+        REQUIRE(decoded[5] == 'Z');
+      }
+    }
+  }
+}
