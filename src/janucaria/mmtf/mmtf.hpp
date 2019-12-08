@@ -133,6 +133,34 @@ auto decode_header_type_3(CodecHeader<T> header) -> std::vector<std::int16_t>
   return output;
 }
 
+template <typename T>
+auto decode_header_type_4(CodecHeader<T> header) -> std::vector<std::int32_t>
+{
+  if (header.strategy != 4)
+  {
+    const auto message = fmt::format("Wrong strategy type, expected 4 got {}.", header.strategy);
+    throw std::invalid_argument{message};
+  }
+
+  if (header.encoded_data.size() % 4 != 0)
+  {
+    const auto message = fmt::format("Data length {} is not a multiple of {}.", header.encoded_data.size(), 4);
+    throw std::invalid_argument{message};
+  }
+
+  auto output = std::vector<std::int32_t>{};
+
+  const auto data_size = header.encoded_data.size() / 4;
+  const auto data_view = gsl::span<const std::int32_t>{reinterpret_cast<const std::int32_t *>(header.encoded_data.data()), data_size};
+
+  output.reserve(data_size);
+  std::transform(std::cbegin(data_view), std::cend(data_view), std::back_inserter(output), [](auto val) noexcept {
+    return boost::endian::big_to_native(val);
+  });
+
+  return output;
+}
+
 } // namespace janucaria::mmtf
 
 #endif
