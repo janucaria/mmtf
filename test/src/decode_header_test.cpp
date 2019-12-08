@@ -214,3 +214,40 @@ SCENARIO("Run-length encoded character array")
     }
   }
 }
+
+SCENARIO("Run-length encoded 32-bit signed integer array")
+{
+  GIVEN("Encoded data with strategy type 7")
+  {
+    const auto encoded = std::vector<char>{
+        // strategy
+        '\x00', '\x00', '\x00', '\x07',
+        // length
+        '\x00', '\x00', '\x00', '\x05',
+        // parameter
+        '\x00', '\x00', '\x00', '\x00',
+        // data
+        '\x00', '\x00', '\x00', '\x01',
+        '\x00', '\x00', '\x00', '\x03',
+        '\x00', '\x00', '\x00', '\xaa',
+        '\x00', '\x00', '\x00', '\x00',
+        '\x00', '\x00', '\x00', '\x09',
+        '\x00', '\x00', '\x00', '\x02'};
+
+    WHEN("Decode code header")
+    {
+      const auto header = mmtf::make_codec_header(encoded);
+      const auto decoded = mmtf::decode_header_type_7(header);
+
+      THEN("Get decoded data")
+      {
+        REQUIRE(decoded.size() == 5);
+        REQUIRE(decoded[0] == 1);
+        REQUIRE(decoded[1] == 1);
+        REQUIRE(decoded[2] == 1);
+        REQUIRE(decoded[3] == 9);
+        REQUIRE(decoded[4] == 9);
+      }
+    }
+  }
+}
