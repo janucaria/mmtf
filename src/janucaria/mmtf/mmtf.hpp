@@ -61,7 +61,7 @@ auto decode_header_type_1(CodecHeader<T> header) -> std::vector<float>
     const auto message = fmt::format("Wrong strategy type, expected 1 got {}.", header.strategy);
     throw std::invalid_argument{message};
   }
-  
+
   if (header.encoded_data.size() % 4 != 0)
   {
     const auto message = fmt::format("Data length {} is not a multiple of {}.", header.encoded_data.size(), 4);
@@ -76,7 +76,30 @@ auto decode_header_type_1(CodecHeader<T> header) -> std::vector<float>
   output.reserve(data_size);
   std::transform(std::cbegin(floats_view), std::cend(floats_view), std::back_inserter(output), [](auto val) noexcept {
     const auto native_val = boost::endian::big_to_native(val);
-    return *reinterpret_cast<const float*>(&native_val);;
+    return *reinterpret_cast<const float *>(&native_val);
+    ;
+  });
+
+  return output;
+}
+
+template <typename T>
+auto decode_header_type_2(CodecHeader<T> header) -> std::vector<std::int8_t>
+{
+  if (header.strategy != 2)
+  {
+    const auto message = fmt::format("Wrong strategy type, expected 2 got {}.", header.strategy);
+    throw std::invalid_argument{message};
+  }
+
+  auto output = std::vector<std::int8_t>{};
+
+  const auto data_size = header.encoded_data.size();
+  const auto data_view = header.encoded_data;
+
+  output.reserve(data_size);
+  std::transform(std::cbegin(data_view), std::cend(data_view), std::back_inserter(output), [](auto val) noexcept {
+    return std::int8_t{boost::endian::big_to_native(val)};
   });
 
   return output;

@@ -39,3 +39,36 @@ SCENARIO("Pass-through: 32-bit floating-point number array")
     }
   }
 }
+
+SCENARIO("Pass-through: 8-bit signed integer array")
+{
+  GIVEN("Encoded data with strategy type 2")
+  {
+    const auto encoded = std::vector<char>{
+        // strategy
+        '\x00', '\x00', '\x00', '\x02',
+        // length
+        '\x00', '\x00', '\x00', '\x05',
+        // parameter
+        '\x00', '\x00', '\x00', '\x00',
+        // data
+        '\x07', '\x06', '\x06', '\x07',
+        '\x07'};
+
+    WHEN("Decode code header")
+    {
+      const auto header = mmtf::make_codec_header(encoded);
+      const auto decoded = mmtf::decode_header_type_2(header);
+
+      THEN("Get decoded data")
+      {
+        REQUIRE(decoded.size() == 5);
+        REQUIRE(decoded[0] == 0x07);
+        REQUIRE(decoded[1] == 0x06);
+        REQUIRE(decoded[2] == 0x06);
+        REQUIRE(decoded[3] == 0x07);
+        REQUIRE(decoded[4] == 0x07);
+      }
+    }
+  }
+}
