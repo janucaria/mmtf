@@ -138,3 +138,41 @@ SCENARIO("Pass-through: 32-bit signed integer array")
     }
   }
 }
+
+SCENARIO("UTF8/ASCII fixed-length string array")
+{
+  GIVEN("Encoded data with strategy type 5")
+  {
+    const auto encoded = std::vector<char>{
+        // strategy
+        '\x00', '\x00', '\x00', '\x05',
+        // length
+        '\x00', '\x00', '\x00', '\x06',
+        // parameter
+        '\x00', '\x00', '\x00', '\x04',
+        // data
+        'A', '\x00', '\x00', '\x00',
+        'B', '\x00', '\x00', '\x00',
+        'C', '\x00', '\x00', '\x00',
+        'D', '\x00', '\x00', '\x00',
+        'E', '\x00', '\x00', '\x00',
+        'F', '\x00', '\x00', '\x00'};
+
+    WHEN("Decode code header")
+    {
+      const auto header = mmtf::make_codec_header(encoded);
+      const auto decoded = mmtf::decode_header_type_5(header);
+
+      THEN("Get decoded data")
+      {
+        REQUIRE(decoded.size() == 6);
+        REQUIRE(decoded[0] == "A");
+        REQUIRE(decoded[1] == "B");
+        REQUIRE(decoded[2] == "C");
+        REQUIRE(decoded[3] == "D");
+        REQUIRE(decoded[4] == "E");
+        REQUIRE(decoded[5] == "F");
+      }
+    }
+  }
+}

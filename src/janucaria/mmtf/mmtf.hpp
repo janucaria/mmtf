@@ -161,6 +161,39 @@ auto decode_header_type_4(CodecHeader<T> header) -> std::vector<std::int32_t>
   return output;
 }
 
+template <typename T>
+auto decode_header_type_5(CodecHeader<T> header) -> std::vector<std::string>
+{
+  if (header.strategy != 5)
+  {
+    const auto message = fmt::format("Wrong strategy type, expected 5 got {}.", header.strategy);
+    throw std::invalid_argument{message};
+  }
+
+  const auto length_array = header.length;
+  const auto chars_size = boost::endian::big_to_native(*reinterpret_cast<const std::int32_t *>(header.parameter.data()));
+  const auto data_size = length_array * chars_size;
+
+  if (header.encoded_data.size() != data_size)
+  {
+    const auto message = fmt::format("Data length is corrupt, {} expected, got {}.", data_size, header.encoded_data.size());
+    throw std::invalid_argument{message};
+  }
+
+  auto output = std::vector<std::string>{};
+
+  const auto data_view = header.encoded_data;
+
+  output.reserve(data_size);
+  for (auto it = std::cbegin(data_view); it != std::cend(data_view); std::advance(it, chars_size))
+  {
+    const auto str = std::string{it.operator->(), static_cast<std::size_t>(chars_size)} + '\0';
+    output.push_back(str.c_str());
+  }
+
+  return output;
+}
+
 } // namespace janucaria::mmtf
 
 #endif
