@@ -17,7 +17,7 @@ namespace janucaria::mmtf
 
 template <typename TInIter,
           std::enable_if_t<is_iter_value_1byte_integral_v<TInIter>> * = nullptr>
-auto decode_header(TInIter iter, TInIter iter_end) noexcept
+auto make_codec_header(TInIter iter, TInIter iter_end) noexcept
   -> CodecHeader<std::add_const_t<typename std::iterator_traits<TInIter>::value_type>>
 {
   using DataByte = std::add_const_t<typename std::iterator_traits<TInIter>::value_type>;
@@ -47,9 +47,9 @@ auto decode_header(TInIter iter, TInIter iter_end) noexcept
 }
 
 template <typename TRange>
-auto decode_header(TRange &&range) noexcept -> decltype(auto)
+auto make_codec_header(TRange &&range) noexcept -> decltype(auto)
 {
-  return decode_header(std::cbegin(std::forward<TRange>(range)), std::cend(std::forward<TRange>(range)));
+  return make_codec_header(std::cbegin(std::forward<TRange>(range)), std::cend(std::forward<TRange>(range)));
 }
 
 } // namespace janucaria::mmtf

@@ -19,7 +19,7 @@ SCENARIO("Extract Codec from mutable data")
 
     WHEN("Extract codec header from iterator")
     {
-      const auto header = mmtf::decode_header(encoded.begin(), encoded.end());
+      const auto header = mmtf::make_codec_header(encoded.begin(), encoded.end());
 
       THEN("Get codec header")
       {
@@ -50,7 +50,7 @@ SCENARIO("Extract Codec from immutable data")
 
     WHEN("Extract codec header from container")
     {
-      const auto header = mmtf::decode_header(encoded);
+      const auto header = mmtf::make_codec_header(encoded);
 
       THEN("Get codec header")
       {
