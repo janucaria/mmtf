@@ -266,6 +266,60 @@ auto decode_header_type_7(CodecHeader<T> header) -> std::vector<std::int32_t>
   return output;
 }
 
+template <typename T>
+auto decode_header_type_8(CodecHeader<T> header) -> std::vector<std::int32_t>
+{
+  if (header.strategy != 8)
+  {
+    const auto message = fmt::format("Wrong strategy type, expected 8 got {}.", header.strategy);
+    throw std::invalid_argument{message};
+  }
+
+  if (header.encoded_data.size() % 4 != 0)
+  {
+    const auto message = fmt::format("Data length {} is not a multiple of {}.", header.encoded_data.size(), 4);
+    throw std::invalid_argument{message};
+  }
+
+  const auto data_size = header.encoded_data.size() / 4;
+  if (data_size % 2 != 0)
+  {
+    const auto message = "Data run length size is not even.";
+    throw std::invalid_argument{message};
+  }
+
+  auto run_length = std::vector<std::int32_t>{};
+  const auto data_view = gsl::span<const std::int32_t>{reinterpret_cast<const std::int32_t *>(header.encoded_data.data()), data_size};
+
+  for (auto it = std::cbegin(data_view); it != std::cend(data_view); std::advance(it, 2))
+  {
+    const auto value = boost::endian::big_to_native(*it);
+    const auto count = boost::endian::big_to_native(*std::next(it));
+    std::fill_n(std::back_inserter(run_length), count, value);
+  }
+
+  auto output = std::vector<std::int32_t>{};
+  output.reserve(run_length.size());
+
+  auto iter_begin = std::cbegin(run_length);
+  auto iter_end = std::cend(run_length);
+  auto output_inserter = std::back_inserter(output);
+
+  if (iter_begin != iter_end)
+  {
+    auto prev_val = *iter_begin++;
+    *output_inserter++ = prev_val;
+    while (iter_begin != iter_end)
+    {
+      auto current_val = prev_val + *iter_begin++;
+      *output_inserter++ = current_val;
+      prev_val = current_val;
+    }
+  }
+
+  return output;
+}
+
 } // namespace janucaria::mmtf
 
 #endif
