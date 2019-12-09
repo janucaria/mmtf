@@ -286,3 +286,38 @@ SCENARIO("Delta & run-length encoded 32-bit signed integer array")
     }
   }
 }
+
+SCENARIO("Integer & run-length encoded 32-bit floating-point number array")
+{
+  GIVEN("Encoded data with strategy type 9")
+  {
+    const auto encoded = std::vector<char>{
+        // strategy
+        '\x00', '\x00', '\x00', '\x09',
+        // length
+        '\x00', '\x00', '\x00', '\x05',
+        // parameter
+        '\x00', '\x00', '\x00', '\x0c',
+        // data
+        '\x00', '\x00', '\x00', '\x06',
+        '\x00', '\x00', '\x00', '\x02',
+        '\x00', '\x00', '\x00', '\x0c',
+        '\x00', '\x00', '\x00', '\x03'};
+
+    WHEN("Decode code header")
+    {
+      const auto header = mmtf::make_codec_header(encoded);
+      const auto decoded = mmtf::decode_header_type_9(header);
+
+      THEN("Get decoded data")
+      {
+        CHECK(decoded.size() == 5);
+        CHECK(decoded[0] == .5f);
+        CHECK(decoded[1] == .5f);
+        CHECK(decoded[2] == 1.f);
+        CHECK(decoded[3] == 1.f);
+        CHECK(decoded[4] == 1.f);
+      }
+    }
+  }
+}
