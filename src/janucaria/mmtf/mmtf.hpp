@@ -6,6 +6,7 @@
 #include <cassert>
 #include <exception>
 #include <iterator>
+#include <limits>
 
 #include <boost/endian/conversion.hpp>
 #include <fmt/format.h>
@@ -357,6 +358,80 @@ auto decode_header_type_9(CodecHeader<T> header) -> std::vector<float>
 
   const auto divisor = boost::endian::big_to_native(*reinterpret_cast<const std::uint32_t *>(header.parameter.data()));
   std::transform(std::cbegin(run_length), std::cend(run_length), std::back_inserter(output), [divisor](auto val) noexcept {
+    return static_cast<const float>(val) / divisor;
+  });
+
+  return output;
+}
+
+template <typename T>
+auto decode_header_type_10(CodecHeader<T> header) -> std::vector<float>
+{
+  constexpr auto strategy = 10;
+  if (header.strategy != strategy)
+  {
+    const auto message = fmt::format("Wrong strategy type, expected {} got {}.", strategy, header.strategy);
+    throw std::invalid_argument{message};
+  }
+
+  constexpr auto type_size = sizeof(std::uint16_t);
+  if (header.encoded_data.size() % type_size != 0)
+  {
+    const auto message = fmt::format("Data length {} is not a multiple of {}.", header.encoded_data.size(), type_size);
+    throw std::invalid_argument{message};
+  }
+
+  auto decoded_data = std::vector<std::int16_t>{};
+
+  const auto data_size = header.encoded_data.size() / static_cast<decltype(header.encoded_data.size())>(type_size);
+  const auto data_view = gsl::span<const std::int16_t>{reinterpret_cast<const std::int16_t *>(header.encoded_data.data()), data_size};
+
+  decoded_data.reserve(data_size);
+  std::transform(std::cbegin(data_view), std::cend(data_view), std::back_inserter(decoded_data), [](auto val) noexcept {
+    return boost::endian::big_to_native(val);
+  });
+
+  constexpr auto min_int = std::numeric_limits<std::int16_t>::min();
+  constexpr auto max_int = std::numeric_limits<std::int16_t>::max();
+
+  auto decoded_recursive_indexing = std::vector<std::int32_t>{};
+  decoded_recursive_indexing.reserve(decoded_data.size());
+
+  auto cur_val = std::int32_t{};
+  for (auto val : decoded_data)
+  {
+    cur_val += val;
+    if (val != min_int && val != max_int)
+    {
+      decoded_recursive_indexing.push_back(cur_val);
+      cur_val = 0;
+    }
+  }
+
+  auto decoded_delta = std::vector<std::int32_t>{};
+  decoded_delta.reserve(decoded_recursive_indexing.size());
+
+  auto iter_begin = std::cbegin(decoded_recursive_indexing);
+  auto iter_end = std::cend(decoded_recursive_indexing);
+  auto iter_output = std::back_inserter(decoded_delta);
+
+  if (iter_begin != iter_end)
+  {
+    auto prev_val = *iter_begin++;
+    *iter_output++ = prev_val;
+    while (iter_begin != iter_end)
+    {
+      auto current_val = prev_val + *iter_begin++;
+      *iter_output++ = current_val;
+      prev_val = current_val;
+    }
+  }
+
+  auto output = std::vector<float>{};
+  output.reserve(decoded_delta.size());
+
+  const auto divisor = boost::endian::big_to_native(*reinterpret_cast<const std::int32_t *>(header.parameter.data()));
+  std::transform(std::cbegin(decoded_delta), std::cend(decoded_delta), std::back_inserter(output), [divisor](auto val) noexcept {
     return static_cast<const float>(val) / divisor;
   });
 
