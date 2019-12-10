@@ -572,6 +572,53 @@ auto decode_header_type_13(CodecHeader<T> header) -> std::vector<float>
   return output;
 }
 
+template <typename T>
+auto decode_header_type_14(CodecHeader<T> header) -> std::vector<std::int32_t>
+{
+  constexpr auto strategy = 14;
+  if (header.strategy != strategy)
+  {
+    const auto message = fmt::format("Wrong strategy type, expected {} got {}.", strategy, header.strategy);
+    throw std::invalid_argument{message};
+  }
+
+  constexpr auto type_size = sizeof(std::int16_t);
+  if (header.encoded_data.size() % type_size != 0)
+  {
+    const auto message = fmt::format("Data length {} is not a multiple of {}.", header.encoded_data.size(), type_size);
+    throw std::invalid_argument{message};
+  }
+
+  auto decoded_data = std::vector<std::int16_t>{};
+
+  const auto data_size = header.encoded_data.size() / static_cast<decltype(header.encoded_data.size())>(type_size);
+  const auto data_view = gsl::span<const std::int16_t>{reinterpret_cast<const std::int16_t *>(header.encoded_data.data()), data_size};
+
+  decoded_data.reserve(data_size);
+  std::transform(std::cbegin(data_view), std::cend(data_view), std::back_inserter(decoded_data), [](auto val) noexcept {
+    return boost::endian::big_to_native(val);
+  });
+
+  constexpr auto min_int = std::numeric_limits<std::int16_t>::min();
+  constexpr auto max_int = std::numeric_limits<std::int16_t>::max();
+
+  auto output = std::vector<std::int32_t>{};
+  output.reserve(decoded_data.size());
+
+  auto cur_val = std::int32_t{};
+  for (auto val : decoded_data)
+  {
+    cur_val += val;
+    if (val != min_int && val != max_int)
+    {
+      output.push_back(cur_val);
+      cur_val = 0;
+    }
+  }
+
+  return output;
+}
+
 } // namespace janucaria::mmtf
 
 #endif

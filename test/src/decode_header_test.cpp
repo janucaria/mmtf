@@ -449,3 +449,34 @@ SCENARIO("Integer & one-byte-packed 32-bit floating-point number array")
     }
   }
 }
+
+SCENARIO("Two-byte-packed 32-bit signed integer array")
+{
+  GIVEN("Encoded data with strategy type 14")
+  {
+    const auto encoded = std::vector<char>{
+        // strategy
+        '\x00', '\x00', '\x00', '\x0e',
+        // length
+        '\x00', '\x00', '\x00', '\x03',
+        // parameter
+        '\x00', '\x00', '\x03', '\xe8',
+        // data
+        '\x7f', '\xff', '\x44', '\xab',
+        '\x01', '\x8f', '\xff', '\xca'};
+
+    WHEN("Decode code header")
+    {
+      const auto header = mmtf::make_codec_header(encoded);
+      const auto decoded = mmtf::decode_header_type_14(header);
+
+      THEN("Get decoded data")
+      {
+        REQUIRE(decoded.size() == 3);
+        CHECK(decoded[0] == 50346);
+        CHECK(decoded[1] == 399);
+        CHECK(decoded[2] == -54);
+      }
+    }
+  }
+}
