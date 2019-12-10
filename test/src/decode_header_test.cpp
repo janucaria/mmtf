@@ -480,3 +480,37 @@ SCENARIO("Two-byte-packed 32-bit signed integer array")
     }
   }
 }
+
+SCENARIO("One-byte-packed 32-bit signed integer array")
+{
+  GIVEN("Encoded data with strategy type 15")
+  {
+    const auto encoded = std::vector<char>{
+        // strategy
+        '\x00', '\x00', '\x00', '\x0f',
+        // length
+        '\x00', '\x00', '\x00', '\x06',
+        // parameter
+        '\x00', '\x00', '\x00', '\x00',
+        // data
+        '\x7f', '\xff', '\x44', '\xab',
+        '\x01', '\x80', '\xff', '\xca'};
+
+    WHEN("Decode code header")
+    {
+      const auto header = mmtf::make_codec_header(encoded);
+      const auto decoded = mmtf::decode_header_type_15(header);
+
+      THEN("Get decoded data")
+      {
+        REQUIRE(decoded.size() == 6);
+        CHECK(decoded[0] == 126);
+        CHECK(decoded[1] == 68);
+        CHECK(decoded[2] == -85);
+        CHECK(decoded[3] == 1);
+        CHECK(decoded[4] == -129);
+        CHECK(decoded[5] == -54);
+      }
+    }
+  }
+}
