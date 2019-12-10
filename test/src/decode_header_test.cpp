@@ -352,3 +352,35 @@ SCENARIO("Integer & delta encoded & two-byte-packed 32-bit floating-point number
     }
   }
 }
+
+SCENARIO("Integer encoded 32-bit floating-point number array")
+{
+  GIVEN("Encoded data with strategy type 11")
+  {
+    const auto encoded = std::vector<char>{
+        // strategy
+        '\x00', '\x00', '\x00', '\x0b',
+        // length
+        '\x00', '\x00', '\x00', '\x04',
+        // parameter
+        '\x00', '\x00', '\x00', '\x04',
+        // data
+        '\x00', '\x01', '\x00', '\x02',
+        '\x00', '\x04', '\x00', '\x10'};
+
+    WHEN("Decode code header")
+    {
+      const auto header = mmtf::make_codec_header(encoded);
+      const auto decoded = mmtf::decode_header_type_11(header);
+
+      THEN("Get decoded data")
+      {
+        REQUIRE(decoded.size() == 4);
+        CHECK(decoded[0] == Approx(0.25f));
+        CHECK(decoded[1] == Approx(0.50f));
+        CHECK(decoded[2] == Approx(1.00f));
+        CHECK(decoded[3] == Approx(4.00f));
+      }
+    }
+  }
+}
