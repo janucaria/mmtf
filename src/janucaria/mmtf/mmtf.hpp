@@ -531,6 +531,47 @@ auto decode_header_type_12(CodecHeader<T> header) -> std::vector<float>
   return output;
 }
 
+template <typename T>
+auto decode_header_type_13(CodecHeader<T> header) -> std::vector<float>
+{
+  constexpr auto strategy = 13;
+  if (header.strategy != strategy)
+  {
+    const auto message = fmt::format("Wrong strategy type, expected {} got {}.", strategy, header.strategy);
+    throw std::invalid_argument{message};
+  }
+
+  const auto data_size = header.encoded_data.size();
+  const auto decoded_data = gsl::span<const std::int8_t>{reinterpret_cast<const std::int8_t *>(header.encoded_data.data()), data_size};
+
+  constexpr auto min_int = std::numeric_limits<std::int8_t>::min();
+  constexpr auto max_int = std::numeric_limits<std::int8_t>::max();
+
+  auto decoded_recursive_indexing = std::vector<std::int32_t>{};
+  decoded_recursive_indexing.reserve(decoded_data.size());
+
+  auto cur_val = std::int32_t{};
+  for (auto val : decoded_data)
+  {
+    cur_val += val;
+    if (val != min_int && val != max_int)
+    {
+      decoded_recursive_indexing.push_back(cur_val);
+      cur_val = 0;
+    }
+  }
+
+  auto output = std::vector<float>{};
+  output.reserve(decoded_recursive_indexing.size());
+
+  const auto divisor = boost::endian::big_to_native(*reinterpret_cast<const std::int32_t *>(header.parameter.data()));
+  std::transform(std::cbegin(decoded_recursive_indexing), std::cend(decoded_recursive_indexing), std::back_inserter(output), [divisor](auto val) noexcept {
+    return static_cast<const float>(val) / divisor;
+  });
+
+  return output;
+}
+
 } // namespace janucaria::mmtf
 
 #endif
