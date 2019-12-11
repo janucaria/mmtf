@@ -26,3 +26,22 @@ SCENARIO("Run-length encoding")
     }
   }
 }
+
+SCENARIO("Delta encoding")
+{
+  GIVEN("Data to encode")
+  {
+    const auto data = std::vector<int>{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1};
+
+    WHEN("Encode data with Delta encoding")
+    {
+      auto output = std::vector<int>{};
+      mmtf::delta_decode(data, std::back_inserter(output));
+
+      THEN("Data encoded")
+      {
+        REQUIRE(output == std::vector<int>{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16});
+      }
+    }
+  }
+}

@@ -37,6 +37,30 @@ constexpr auto run_length_decode(TRange &&range, TOutIter output) -> decltype(au
   return run_length_decode(std::cbegin(std::forward<TRange>(range)), std::cend(std::forward<TRange>(range)), output);
 }
 
+template <typename TInIter, typename TOutIter>
+constexpr auto delta_decode(TInIter first, TInIter last, TOutIter output) -> TOutIter
+{
+  if (first != last)
+  {
+    auto prev_val = *first++;
+    *output++ = prev_val;
+    while (first != last)
+    {
+      auto current_val = prev_val + *first++;
+      *output++ = current_val;
+      prev_val = current_val;
+    }
+  }
+
+  return output;
+}
+
+template <typename TRange, typename TOutIter>
+constexpr auto delta_decode(TRange &&range, TOutIter output) -> decltype(auto)
+{
+  return delta_decode(std::cbegin(std::forward<TRange>(range)), std::cend(std::forward<TRange>(range)), output);
+}
+
 template <typename TInIter,
           std::enable_if_t<is_iter_value_1byte_integral_v<TInIter>> * = nullptr>
 auto make_codec_header(TInIter iter, TInIter iter_end) noexcept
@@ -314,22 +338,7 @@ auto decode_header_type_8(CodecHeader<T> header) -> std::vector<std::int32_t>
 
   auto output = std::vector<std::int32_t>{};
   output.reserve(run_length.size());
-
-  auto iter_begin = std::cbegin(run_length);
-  auto iter_end = std::cend(run_length);
-  auto output_inserter = std::back_inserter(output);
-
-  if (iter_begin != iter_end)
-  {
-    auto prev_val = *iter_begin++;
-    *output_inserter++ = prev_val;
-    while (iter_begin != iter_end)
-    {
-      auto current_val = prev_val + *iter_begin++;
-      *output_inserter++ = current_val;
-      prev_val = current_val;
-    }
-  }
+  delta_decode(run_length, std::back_inserter(output));
 
   return output;
 }
@@ -421,22 +430,7 @@ auto decode_header_type_10(CodecHeader<T> header) -> std::vector<float>
 
   auto decoded_delta = std::vector<std::int32_t>{};
   decoded_delta.reserve(decoded_recursive_indexing.size());
-
-  auto iter_begin = std::cbegin(decoded_recursive_indexing);
-  auto iter_end = std::cend(decoded_recursive_indexing);
-  auto iter_output = std::back_inserter(decoded_delta);
-
-  if (iter_begin != iter_end)
-  {
-    auto prev_val = *iter_begin++;
-    *iter_output++ = prev_val;
-    while (iter_begin != iter_end)
-    {
-      auto current_val = prev_val + *iter_begin++;
-      *iter_output++ = current_val;
-      prev_val = current_val;
-    }
-  }
+  delta_decode(decoded_recursive_indexing, std::back_inserter(decoded_delta));
 
   auto output = std::vector<float>{};
   output.reserve(decoded_delta.size());
