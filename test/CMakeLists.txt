@@ -6,6 +6,7 @@ target_sources(janucaria-mmtf-test
   PRIVATE
     src/codec_header_test.cpp
     src/decode_header_test.cpp
+    src/encoding_test.cpp
     src/main.cpp
 )
 

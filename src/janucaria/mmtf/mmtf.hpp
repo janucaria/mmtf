@@ -18,6 +18,25 @@
 namespace janucaria::mmtf
 {
 
+template <typename TInIter, typename TOutIter>
+constexpr auto run_length_decode(TInIter first, TInIter last, TOutIter output) -> TOutIter
+{
+  while (first != last)
+  {
+    const auto value = *first++;
+    const auto count = *first++;
+    std::fill_n(output, count, value);
+  }
+
+  return output;
+}
+
+template <typename TRange, typename TOutIter>
+constexpr auto run_length_decode(TRange &&range, TOutIter output) -> decltype(auto)
+{
+  return run_length_decode(std::cbegin(std::forward<TRange>(range)), std::cend(std::forward<TRange>(range)), output);
+}
+
 template <typename TInIter,
           std::enable_if_t<is_iter_value_1byte_integral_v<TInIter>> * = nullptr>
 auto make_codec_header(TInIter iter, TInIter iter_end) noexcept
@@ -220,13 +239,11 @@ auto decode_header_type_6(CodecHeader<T> header) -> std::vector<char>
   }
 
   const auto data_view = gsl::span<const std::int32_t>{reinterpret_cast<const std::int32_t *>(header.encoded_data.data()), data_size};
-
-  for (auto it = std::cbegin(data_view); it != std::cend(data_view); std::advance(it, 2))
-  {
-    const auto value = static_cast<char>(boost::endian::big_to_native(*it));
-    const auto count = boost::endian::big_to_native(*std::next(it));
-    std::fill_n(std::back_inserter(output), count, value);
-  }
+  auto endian_data = std::vector<std::int32_t>{};
+  std::transform(std::cbegin(data_view), std::cend(data_view), std::back_inserter(endian_data), [](auto val) noexcept {
+    return boost::endian::big_to_native(val);
+  });
+  run_length_decode(endian_data, std::back_inserter(output));
 
   return output;
 }
@@ -256,13 +273,11 @@ auto decode_header_type_7(CodecHeader<T> header) -> std::vector<std::int32_t>
   }
 
   const auto data_view = gsl::span<const std::int32_t>{reinterpret_cast<const std::int32_t *>(header.encoded_data.data()), data_size};
-
-  for (auto it = std::cbegin(data_view); it != std::cend(data_view); std::advance(it, 2))
-  {
-    const auto value = boost::endian::big_to_native(*it);
-    const auto count = boost::endian::big_to_native(*std::next(it));
-    std::fill_n(std::back_inserter(output), count, value);
-  }
+  auto endian_data = std::vector<std::int32_t>{};
+  std::transform(std::cbegin(data_view), std::cend(data_view), std::back_inserter(endian_data), [](auto val) noexcept {
+    return boost::endian::big_to_native(val);
+  });
+  run_length_decode(endian_data, std::back_inserter(output));
 
   return output;
 }
@@ -291,13 +306,11 @@ auto decode_header_type_8(CodecHeader<T> header) -> std::vector<std::int32_t>
 
   auto run_length = std::vector<std::int32_t>{};
   const auto data_view = gsl::span<const std::int32_t>{reinterpret_cast<const std::int32_t *>(header.encoded_data.data()), data_size};
-
-  for (auto it = std::cbegin(data_view); it != std::cend(data_view); std::advance(it, 2))
-  {
-    const auto value = boost::endian::big_to_native(*it);
-    const auto count = boost::endian::big_to_native(*std::next(it));
-    std::fill_n(std::back_inserter(run_length), count, value);
-  }
+  auto endian_data = std::vector<std::int32_t>{};
+  std::transform(std::cbegin(data_view), std::cend(data_view), std::back_inserter(endian_data), [](auto val) noexcept {
+    return boost::endian::big_to_native(val);
+  });
+  run_length_decode(endian_data, std::back_inserter(run_length));
 
   auto output = std::vector<std::int32_t>{};
   output.reserve(run_length.size());
@@ -345,13 +358,11 @@ auto decode_header_type_9(CodecHeader<T> header) -> std::vector<float>
 
   auto run_length = std::vector<std::int32_t>{};
   const auto data_view = gsl::span<const std::int32_t>{reinterpret_cast<const std::int32_t *>(header.encoded_data.data()), data_size};
-
-  for (auto it = std::cbegin(data_view); it != std::cend(data_view); std::advance(it, 2))
-  {
-    const auto value = boost::endian::big_to_native(*it);
-    const auto count = boost::endian::big_to_native(*std::next(it));
-    std::fill_n(std::back_inserter(run_length), count, value);
-  }
+  auto endian_data = std::vector<std::int32_t>{};
+  std::transform(std::cbegin(data_view), std::cend(data_view), std::back_inserter(endian_data), [](auto val) noexcept {
+    return boost::endian::big_to_native(val);
+  });
+  run_length_decode(endian_data, std::back_inserter(run_length));
 
   auto output = std::vector<float>{};
   output.reserve(run_length.size());
@@ -648,7 +659,7 @@ auto decode_header_type_15(CodecHeader<T> header) -> std::vector<std::int32_t>
       cur_val = 0;
     }
   }
-  
+
   return output;
 }
 
