@@ -61,6 +61,36 @@ constexpr auto delta_decode(TRange &&range, TOutIter output) -> decltype(auto)
   return delta_decode(std::cbegin(std::forward<TRange>(range)), std::cend(std::forward<TRange>(range)), output);
 }
 
+template <typename TInIter, typename TOutIter>
+constexpr auto recursive_indexing_decode(TInIter first, TInIter last, TOutIter output) -> TOutIter
+{
+  using InputValue = typename std::iterator_traits<TInIter>::value_type;
+
+  constexpr auto min_int = std::numeric_limits<InputValue>::min();
+  constexpr auto max_int = std::numeric_limits<InputValue>::max();
+
+  auto cur_val = std::common_type_t<InputValue, int>{};
+
+  for (; first != last; ++first)
+  {
+    const auto val = *first;
+    cur_val += val;
+    if (val != min_int && val != max_int)
+    {
+      *output++ = cur_val;
+      cur_val = 0;
+    }
+  }
+
+  return output;
+}
+
+template <typename TRange, typename TOutIter>
+constexpr auto recursive_indexing_decode(TRange &&range, TOutIter output) -> decltype(auto)
+{
+  return recursive_indexing_decode(std::cbegin(std::forward<TRange>(range)), std::cend(std::forward<TRange>(range)), output);
+}
+
 template <typename TInIter,
           std::enable_if_t<is_iter_value_1byte_integral_v<TInIter>> * = nullptr>
 auto make_codec_header(TInIter iter, TInIter iter_end) noexcept
@@ -411,22 +441,9 @@ auto decode_header_type_10(CodecHeader<T> header) -> std::vector<float>
     return boost::endian::big_to_native(val);
   });
 
-  constexpr auto min_int = std::numeric_limits<std::int16_t>::min();
-  constexpr auto max_int = std::numeric_limits<std::int16_t>::max();
-
   auto decoded_recursive_indexing = std::vector<std::int32_t>{};
   decoded_recursive_indexing.reserve(decoded_data.size());
-
-  auto cur_val = std::int32_t{};
-  for (auto val : decoded_data)
-  {
-    cur_val += val;
-    if (val != min_int && val != max_int)
-    {
-      decoded_recursive_indexing.push_back(cur_val);
-      cur_val = 0;
-    }
-  }
+  recursive_indexing_decode(decoded_data, std::back_inserter(decoded_recursive_indexing));
 
   auto decoded_delta = std::vector<std::int32_t>{};
   decoded_delta.reserve(decoded_recursive_indexing.size());
@@ -508,22 +525,9 @@ auto decode_header_type_12(CodecHeader<T> header) -> std::vector<float>
     return boost::endian::big_to_native(val);
   });
 
-  constexpr auto min_int = std::numeric_limits<std::int16_t>::min();
-  constexpr auto max_int = std::numeric_limits<std::int16_t>::max();
-
   auto decoded_recursive_indexing = std::vector<std::int32_t>{};
   decoded_recursive_indexing.reserve(decoded_data.size());
-
-  auto cur_val = std::int32_t{};
-  for (auto val : decoded_data)
-  {
-    cur_val += val;
-    if (val != min_int && val != max_int)
-    {
-      decoded_recursive_indexing.push_back(cur_val);
-      cur_val = 0;
-    }
-  }
+  recursive_indexing_decode(decoded_data, std::back_inserter(decoded_recursive_indexing));
 
   auto output = std::vector<float>{};
   output.reserve(decoded_recursive_indexing.size());
@@ -549,22 +553,9 @@ auto decode_header_type_13(CodecHeader<T> header) -> std::vector<float>
   const auto data_size = header.encoded_data.size();
   const auto decoded_data = gsl::span<const std::int8_t>{reinterpret_cast<const std::int8_t *>(header.encoded_data.data()), data_size};
 
-  constexpr auto min_int = std::numeric_limits<std::int8_t>::min();
-  constexpr auto max_int = std::numeric_limits<std::int8_t>::max();
-
   auto decoded_recursive_indexing = std::vector<std::int32_t>{};
   decoded_recursive_indexing.reserve(decoded_data.size());
-
-  auto cur_val = std::int32_t{};
-  for (auto val : decoded_data)
-  {
-    cur_val += val;
-    if (val != min_int && val != max_int)
-    {
-      decoded_recursive_indexing.push_back(cur_val);
-      cur_val = 0;
-    }
-  }
+  recursive_indexing_decode(decoded_data, std::back_inserter(decoded_recursive_indexing));
 
   auto output = std::vector<float>{};
   output.reserve(decoded_recursive_indexing.size());
@@ -604,22 +595,9 @@ auto decode_header_type_14(CodecHeader<T> header) -> std::vector<std::int32_t>
     return boost::endian::big_to_native(val);
   });
 
-  constexpr auto min_int = std::numeric_limits<std::int16_t>::min();
-  constexpr auto max_int = std::numeric_limits<std::int16_t>::max();
-
   auto output = std::vector<std::int32_t>{};
   output.reserve(decoded_data.size());
-
-  auto cur_val = std::int32_t{};
-  for (auto val : decoded_data)
-  {
-    cur_val += val;
-    if (val != min_int && val != max_int)
-    {
-      output.push_back(cur_val);
-      cur_val = 0;
-    }
-  }
+  recursive_indexing_decode(decoded_data, std::back_inserter(output));
 
   return output;
 }
@@ -637,22 +615,9 @@ auto decode_header_type_15(CodecHeader<T> header) -> std::vector<std::int32_t>
   const auto data_size = header.encoded_data.size();
   const auto decoded_data = gsl::span<const std::int8_t>{reinterpret_cast<const std::int8_t *>(header.encoded_data.data()), data_size};
 
-  constexpr auto min_int = std::numeric_limits<std::int8_t>::min();
-  constexpr auto max_int = std::numeric_limits<std::int8_t>::max();
-
   auto output = std::vector<std::int32_t>{};
   output.reserve(decoded_data.size());
-
-  auto cur_val = std::int32_t{};
-  for (auto val : decoded_data)
-  {
-    cur_val += val;
-    if (val != min_int && val != max_int)
-    {
-      output.push_back(cur_val);
-      cur_val = 0;
-    }
-  }
+  recursive_indexing_decode(decoded_data, std::back_inserter(output));
 
   return output;
 }

@@ -45,3 +45,22 @@ SCENARIO("Delta encoding")
     }
   }
 }
+
+SCENARIO("Recursive indexing encoding")
+{
+  GIVEN("Data to encode")
+  {
+    const auto data = std::vector<std::int8_t>{127, 41, 34, 1, 0, -50, -128, 0, 7, 127, 0, 127, 127, 14};
+
+    WHEN("Encode data with Recursive indexing encoding")
+    {
+      auto output = std::vector<int>{};
+      mmtf::recursive_indexing_decode(data, std::back_inserter(output));
+
+      THEN("Data encoded")
+      {
+        REQUIRE(output == std::vector<int>{168, 34, 1, 0, -50, -128, 7, 127, 268});
+      }
+    }
+  }
+}
