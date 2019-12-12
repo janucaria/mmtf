@@ -64,3 +64,22 @@ SCENARIO("Recursive indexing encoding")
     }
   }
 }
+
+SCENARIO("Integer encoding")
+{
+  GIVEN("Data to encode")
+  {
+    const auto data = std::vector<int>{100, 100, 100, 100, 50, 50};
+
+    WHEN("Encode data with Integer encoding encoding")
+    {
+      auto output = std::vector<float>{};
+      mmtf::integer_decode(data, std::back_inserter(output), 100);
+
+      THEN("Data encoded")
+      {
+        REQUIRE(output == std::vector<float>{1.00, 1.00, 1.00, 1.00, 0.50, 0.50});
+      }
+    }
+  }
+}

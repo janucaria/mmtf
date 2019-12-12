@@ -122,6 +122,22 @@ auto make_codec_header(TInIter iter, TInIter iter_end) noexcept
   return header;
 }
 
+template <typename TInIter, typename TOutIter, typename TDivisor>
+constexpr auto integer_decode(TInIter first, TInIter last, TOutIter output, TDivisor divisor) -> TOutIter
+{
+  std::transform(first, last, output, [divisor](auto val) noexcept {
+    return static_cast<const double>(val) / divisor;
+  });
+
+  return output;
+}
+
+template <typename TRange, typename TOutIter, typename TDivisor>
+constexpr auto integer_decode(TRange &&range, TOutIter output, TDivisor divisor) -> decltype(auto)
+{
+  return integer_decode(std::cbegin(std::forward<TRange>(range)), std::cend(std::forward<TRange>(range)), output, divisor);
+}
+
 template <typename TRange>
 auto make_codec_header(TRange &&range) noexcept -> decltype(auto)
 {
@@ -407,9 +423,7 @@ auto decode_header_type_9(CodecHeader<T> header) -> std::vector<float>
   output.reserve(run_length.size());
 
   const auto divisor = boost::endian::big_to_native(*reinterpret_cast<const std::uint32_t *>(header.parameter.data()));
-  std::transform(std::cbegin(run_length), std::cend(run_length), std::back_inserter(output), [divisor](auto val) noexcept {
-    return static_cast<const float>(val) / divisor;
-  });
+  integer_decode(run_length, std::back_inserter(output), divisor);
 
   return output;
 }
@@ -453,9 +467,7 @@ auto decode_header_type_10(CodecHeader<T> header) -> std::vector<float>
   output.reserve(decoded_delta.size());
 
   const auto divisor = boost::endian::big_to_native(*reinterpret_cast<const std::int32_t *>(header.parameter.data()));
-  std::transform(std::cbegin(decoded_delta), std::cend(decoded_delta), std::back_inserter(output), [divisor](auto val) noexcept {
-    return static_cast<const float>(val) / divisor;
-  });
+  integer_decode(decoded_delta, std::back_inserter(output), divisor);
 
   return output;
 }
@@ -491,9 +503,7 @@ auto decode_header_type_11(CodecHeader<T> header) -> std::vector<float>
   output.reserve(decoded_data.size());
 
   const auto divisor = boost::endian::big_to_native(*reinterpret_cast<const std::int32_t *>(header.parameter.data()));
-  std::transform(std::cbegin(decoded_data), std::cend(decoded_data), std::back_inserter(output), [divisor](auto val) noexcept {
-    return static_cast<const float>(val) / divisor;
-  });
+  integer_decode(decoded_data, std::back_inserter(output), divisor);
 
   return output;
 }
@@ -533,9 +543,7 @@ auto decode_header_type_12(CodecHeader<T> header) -> std::vector<float>
   output.reserve(decoded_recursive_indexing.size());
 
   const auto divisor = boost::endian::big_to_native(*reinterpret_cast<const std::int32_t *>(header.parameter.data()));
-  std::transform(std::cbegin(decoded_recursive_indexing), std::cend(decoded_recursive_indexing), std::back_inserter(output), [divisor](auto val) noexcept {
-    return static_cast<const float>(val) / divisor;
-  });
+  integer_decode(decoded_recursive_indexing, std::back_inserter(output), divisor);
 
   return output;
 }
@@ -561,9 +569,7 @@ auto decode_header_type_13(CodecHeader<T> header) -> std::vector<float>
   output.reserve(decoded_recursive_indexing.size());
 
   const auto divisor = boost::endian::big_to_native(*reinterpret_cast<const std::int32_t *>(header.parameter.data()));
-  std::transform(std::cbegin(decoded_recursive_indexing), std::cend(decoded_recursive_indexing), std::back_inserter(output), [divisor](auto val) noexcept {
-    return static_cast<const float>(val) / divisor;
-  });
+  integer_decode(decoded_recursive_indexing, std::back_inserter(output), divisor);
 
   return output;
 }
