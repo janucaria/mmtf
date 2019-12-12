@@ -10,18 +10,38 @@ SCENARIO("Pass-through: 32-bit floating-point number array")
 {
   GIVEN("Encoded data with strategy type 1")
   {
-    const auto encoded = std::vector<char>{
-        // strategy
-        '\x00', '\x00', '\x00', '\x01',
-        // length
-        '\x00', '\x00', '\x00', '\x04',
-        // parameter
-        '\x00', '\x00', '\x00', '\x00',
-        // data
-        '\x40', '\x20', '\x00', '\x00',
-        '\x3e', '\x99', '\x99', '\x9a',
-        '\xc0', '\xb9', '\x99', '\x9a',
-        '\x41', '\x1e', '\x66', '\x66'};
+    const auto encoded = std::vector<char>{// strategy
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x01',
+                                           // length
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x04',
+                                           // parameter
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           // data
+                                           '\x40',
+                                           '\x20',
+                                           '\x00',
+                                           '\x00',
+                                           '\x3e',
+                                           '\x99',
+                                           '\x99',
+                                           '\x9a',
+                                           '\xc0',
+                                           '\xb9',
+                                           '\x99',
+                                           '\x9a',
+                                           '\x41',
+                                           '\x1e',
+                                           '\x66',
+                                           '\x66'};
 
     WHEN("Decode code header")
     {
@@ -44,16 +64,27 @@ SCENARIO("Pass-through: 8-bit signed integer array")
 {
   GIVEN("Encoded data with strategy type 2")
   {
-    const auto encoded = std::vector<char>{
-        // strategy
-        '\x00', '\x00', '\x00', '\x02',
-        // length
-        '\x00', '\x00', '\x00', '\x05',
-        // parameter
-        '\x00', '\x00', '\x00', '\x00',
-        // data
-        '\x07', '\x06', '\x06', '\x07',
-        '\x07'};
+    const auto encoded = std::vector<char>{// strategy
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x02',
+                                           // length
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x05',
+                                           // parameter
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           // data
+                                           '\x07',
+                                           '\x06',
+                                           '\x06',
+                                           '\x07',
+                                           '\x07'};
 
     WHEN("Decode code header")
     {
@@ -77,16 +108,30 @@ SCENARIO("Pass-through: 16-bit signed integer array")
 {
   GIVEN("Encoded data with strategy type 3")
   {
-    const auto encoded = std::vector<char>{
-        // strategy
-        '\x00', '\x00', '\x00', '\x03',
-        // length
-        '\x00', '\x00', '\x00', '\x04',
-        // parameter
-        '\x00', '\x00', '\x00', '\x00',
-        // data
-        '\x00', '\x06', '\x00', '\x07',
-        '\x00', '\x01', '\x00', '\x09'};
+    const auto encoded = std::vector<char>{// strategy
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x03',
+                                           // length
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x04',
+                                           // parameter
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           // data
+                                           '\x00',
+                                           '\x06',
+                                           '\x00',
+                                           '\x07',
+                                           '\x00',
+                                           '\x01',
+                                           '\x00',
+                                           '\x09'};
 
     WHEN("Decode code header")
     {
@@ -109,18 +154,38 @@ SCENARIO("Pass-through: 32-bit signed integer array")
 {
   GIVEN("Encoded data with strategy type 4")
   {
-    const auto encoded = std::vector<char>{
-        // strategy
-        '\x00', '\x00', '\x00', '\x04',
-        // length
-        '\x00', '\x00', '\x00', '\x04',
-        // parameter
-        '\x00', '\x00', '\x00', '\x00',
-        // data
-        '\x00', '\x00', '\x00', '\x01',
-        '\x00', '\x02', '\x00', '\x01',
-        '\x00', '\x00', '\x00', '\x00',
-        '\x00', '\x00', '\x00', '\x02'};
+    const auto encoded = std::vector<char>{// strategy
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x04',
+                                           // length
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x04',
+                                           // parameter
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           // data
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x01',
+                                           '\x00',
+                                           '\x02',
+                                           '\x00',
+                                           '\x01',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x02'};
 
     WHEN("Decode code header")
     {
@@ -143,20 +208,46 @@ SCENARIO("UTF8/ASCII fixed-length string array")
 {
   GIVEN("Encoded data with strategy type 5")
   {
-    const auto encoded = std::vector<char>{
-        // strategy
-        '\x00', '\x00', '\x00', '\x05',
-        // length
-        '\x00', '\x00', '\x00', '\x06',
-        // parameter
-        '\x00', '\x00', '\x00', '\x04',
-        // data
-        'A', '\x00', '\x00', '\x00',
-        'B', '\x00', '\x00', '\x00',
-        'C', '\x00', '\x00', '\x00',
-        'D', '\x00', '\x00', '\x00',
-        'E', '\x00', '\x00', '\x00',
-        'F', '\x00', '\x00', '\x00'};
+    const auto encoded = std::vector<char>{// strategy
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x05',
+                                           // length
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x06',
+                                           // parameter
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x04',
+                                           // data
+                                           'A',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           'B',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           'C',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           'D',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           'E',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           'F',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00'};
 
     WHEN("Decode code header")
     {
@@ -181,20 +272,46 @@ SCENARIO("Run-length encoded character array")
 {
   GIVEN("Encoded data with strategy type 6")
   {
-    const auto encoded = std::vector<char>{
-        // strategy
-        '\x00', '\x00', '\x00', '\x06',
-        // length
-        '\x00', '\x00', '\x00', '\x06',
-        // parameter
-        '\x00', '\x00', '\x00', '\x00',
-        // data
-        '\x00', '\x00', '\x00', 'A',
-        '\x00', '\x00', '\x00', '\x04',
-        '\x00', '\x00', '\x00', 'Z',
-        '\x00', '\x00', '\x00', '\x02',
-        '\x00', '\x00', '\x00', 'F',
-        '\x00', '\x00', '\x00', '\x00'};
+    const auto encoded = std::vector<char>{// strategy
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x06',
+                                           // length
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x06',
+                                           // parameter
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           // data
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           'A',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x04',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           'Z',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x02',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           'F',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00'};
 
     WHEN("Decode code header")
     {
@@ -219,20 +336,46 @@ SCENARIO("Run-length encoded 32-bit signed integer array")
 {
   GIVEN("Encoded data with strategy type 7")
   {
-    const auto encoded = std::vector<char>{
-        // strategy
-        '\x00', '\x00', '\x00', '\x07',
-        // length
-        '\x00', '\x00', '\x00', '\x05',
-        // parameter
-        '\x00', '\x00', '\x00', '\x00',
-        // data
-        '\x00', '\x00', '\x00', '\x01',
-        '\x00', '\x00', '\x00', '\x03',
-        '\x00', '\x00', '\x00', '\xaa',
-        '\x00', '\x00', '\x00', '\x00',
-        '\x00', '\x00', '\x00', '\x09',
-        '\x00', '\x00', '\x00', '\x02'};
+    const auto encoded = std::vector<char>{// strategy
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x07',
+                                           // length
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x05',
+                                           // parameter
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           // data
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x01',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x03',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\xaa',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x09',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x02'};
 
     WHEN("Decode code header")
     {
@@ -256,16 +399,30 @@ SCENARIO("Delta & run-length encoded 32-bit signed integer array")
 {
   GIVEN("Encoded data with strategy type 8")
   {
-    const auto encoded = std::vector<char>{
-        // strategy
-        '\x00', '\x00', '\x00', '\x08',
-        // length
-        '\x00', '\x00', '\x00', '\x07',
-        // parameter
-        '\x00', '\x00', '\x00', '\x00',
-        // data
-        '\x00', '\x00', '\x00', '\x01',
-        '\x00', '\x00', '\x00', '\x07'};
+    const auto encoded = std::vector<char>{// strategy
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x08',
+                                           // length
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x07',
+                                           // parameter
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           // data
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x01',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x07'};
 
     WHEN("Decode code header")
     {
@@ -291,18 +448,38 @@ SCENARIO("Integer & run-length encoded 32-bit floating-point number array")
 {
   GIVEN("Encoded data with strategy type 9")
   {
-    const auto encoded = std::vector<char>{
-        // strategy
-        '\x00', '\x00', '\x00', '\x09',
-        // length
-        '\x00', '\x00', '\x00', '\x05',
-        // parameter
-        '\x00', '\x00', '\x00', '\x0c',
-        // data
-        '\x00', '\x00', '\x00', '\x06',
-        '\x00', '\x00', '\x00', '\x02',
-        '\x00', '\x00', '\x00', '\x0c',
-        '\x00', '\x00', '\x00', '\x03'};
+    const auto encoded = std::vector<char>{// strategy
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x09',
+                                           // length
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x05',
+                                           // parameter
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x0c',
+                                           // data
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x06',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x02',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x0c',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x03'};
 
     WHEN("Decode code header")
     {
@@ -322,20 +499,35 @@ SCENARIO("Integer & run-length encoded 32-bit floating-point number array")
   }
 }
 
-SCENARIO("Integer & delta encoded & two-byte-packed 32-bit floating-point number array")
+SCENARIO(
+ "Integer & delta encoded & two-byte-packed 32-bit floating-point number array")
 {
   GIVEN("Encoded data with strategy type 10")
   {
-    const auto encoded = std::vector<char>{
-        // strategy
-        '\x00', '\x00', '\x00', '\x0a',
-        // length
-        '\x00', '\x00', '\x00', '\x03',
-        // parameter
-        '\x00', '\x00', '\x03', '\xe8',
-        // data
-        '\x7f', '\xff', '\x44', '\xab',
-        '\x01', '\x8f', '\xff', '\xca'};
+    const auto encoded = std::vector<char>{// strategy
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x0a',
+                                           // length
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x03',
+                                           // parameter
+                                           '\x00',
+                                           '\x00',
+                                           '\x03',
+                                           '\xe8',
+                                           // data
+                                           '\x7f',
+                                           '\xff',
+                                           '\x44',
+                                           '\xab',
+                                           '\x01',
+                                           '\x8f',
+                                           '\xff',
+                                           '\xca'};
 
     WHEN("Decode code header")
     {
@@ -357,16 +549,30 @@ SCENARIO("Integer encoded 32-bit floating-point number array")
 {
   GIVEN("Encoded data with strategy type 11")
   {
-    const auto encoded = std::vector<char>{
-        // strategy
-        '\x00', '\x00', '\x00', '\x0b',
-        // length
-        '\x00', '\x00', '\x00', '\x04',
-        // parameter
-        '\x00', '\x00', '\x00', '\x04',
-        // data
-        '\x00', '\x01', '\x00', '\x02',
-        '\x00', '\x04', '\x00', '\x10'};
+    const auto encoded = std::vector<char>{// strategy
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x0b',
+                                           // length
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x04',
+                                           // parameter
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x04',
+                                           // data
+                                           '\x00',
+                                           '\x01',
+                                           '\x00',
+                                           '\x02',
+                                           '\x00',
+                                           '\x04',
+                                           '\x00',
+                                           '\x10'};
 
     WHEN("Decode code header")
     {
@@ -389,16 +595,30 @@ SCENARIO("Integer & two-byte-packed 32-bit floating-point number array")
 {
   GIVEN("Encoded data with strategy type 12")
   {
-    const auto encoded = std::vector<char>{
-        // strategy
-        '\x00', '\x00', '\x00', '\x0c',
-        // length
-        '\x00', '\x00', '\x00', '\x03',
-        // parameter
-        '\x00', '\x00', '\x03', '\xe8',
-        // data
-        '\x7f', '\xff', '\x44', '\xab',
-        '\x01', '\x8f', '\xff', '\xca'};
+    const auto encoded = std::vector<char>{// strategy
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x0c',
+                                           // length
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x03',
+                                           // parameter
+                                           '\x00',
+                                           '\x00',
+                                           '\x03',
+                                           '\xe8',
+                                           // data
+                                           '\x7f',
+                                           '\xff',
+                                           '\x44',
+                                           '\xab',
+                                           '\x01',
+                                           '\x8f',
+                                           '\xff',
+                                           '\xca'};
 
     WHEN("Decode code header")
     {
@@ -420,16 +640,30 @@ SCENARIO("Integer & one-byte-packed 32-bit floating-point number array")
 {
   GIVEN("Encoded data with strategy type 13")
   {
-    const auto encoded = std::vector<char>{
-        // strategy
-        '\x00', '\x00', '\x00', '\x0d',
-        // length
-        '\x00', '\x00', '\x00', '\x06',
-        // parameter
-        '\x00', '\x00', '\x03', '\xe8',
-        // data
-        '\x7f', '\xff', '\x44', '\xab',
-        '\x01', '\x80', '\xff', '\xca'};
+    const auto encoded = std::vector<char>{// strategy
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x0d',
+                                           // length
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x06',
+                                           // parameter
+                                           '\x00',
+                                           '\x00',
+                                           '\x03',
+                                           '\xe8',
+                                           // data
+                                           '\x7f',
+                                           '\xff',
+                                           '\x44',
+                                           '\xab',
+                                           '\x01',
+                                           '\x80',
+                                           '\xff',
+                                           '\xca'};
 
     WHEN("Decode code header")
     {
@@ -454,16 +688,30 @@ SCENARIO("Two-byte-packed 32-bit signed integer array")
 {
   GIVEN("Encoded data with strategy type 14")
   {
-    const auto encoded = std::vector<char>{
-        // strategy
-        '\x00', '\x00', '\x00', '\x0e',
-        // length
-        '\x00', '\x00', '\x00', '\x03',
-        // parameter
-        '\x00', '\x00', '\x03', '\xe8',
-        // data
-        '\x7f', '\xff', '\x44', '\xab',
-        '\x01', '\x8f', '\xff', '\xca'};
+    const auto encoded = std::vector<char>{// strategy
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x0e',
+                                           // length
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x03',
+                                           // parameter
+                                           '\x00',
+                                           '\x00',
+                                           '\x03',
+                                           '\xe8',
+                                           // data
+                                           '\x7f',
+                                           '\xff',
+                                           '\x44',
+                                           '\xab',
+                                           '\x01',
+                                           '\x8f',
+                                           '\xff',
+                                           '\xca'};
 
     WHEN("Decode code header")
     {
@@ -485,16 +733,30 @@ SCENARIO("One-byte-packed 32-bit signed integer array")
 {
   GIVEN("Encoded data with strategy type 15")
   {
-    const auto encoded = std::vector<char>{
-        // strategy
-        '\x00', '\x00', '\x00', '\x0f',
-        // length
-        '\x00', '\x00', '\x00', '\x06',
-        // parameter
-        '\x00', '\x00', '\x00', '\x00',
-        // data
-        '\x7f', '\xff', '\x44', '\xab',
-        '\x01', '\x80', '\xff', '\xca'};
+    const auto encoded = std::vector<char>{// strategy
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x0f',
+                                           // length
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x06',
+                                           // parameter
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           '\x00',
+                                           // data
+                                           '\x7f',
+                                           '\xff',
+                                           '\x44',
+                                           '\xab',
+                                           '\x01',
+                                           '\x80',
+                                           '\xff',
+                                           '\xca'};
 
     WHEN("Decode code header")
     {

@@ -6,12 +6,10 @@
 
 #include <gsl/gsl>
 
-namespace janucaria::mmtf
-{
+namespace janucaria::mmtf {
 
 template<typename TByte>
-class CodecHeader
-{
+class CodecHeader {
 public:
   std::int32_t strategy{};
 
@@ -20,7 +18,6 @@ public:
   std::array<std::byte, 4> parameter{};
 
   gsl::span<const TByte> encoded_data{};
-
 };
 
 } // namespace janucaria::mmtf

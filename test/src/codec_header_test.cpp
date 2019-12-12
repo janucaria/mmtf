@@ -10,28 +10,27 @@ SCENARIO("Extract Codec from mutable data")
 {
   GIVEN("Encoded mutable vector data")
   {
-    auto encoded = std::vector<char>{
-        '\x00', '\x00', '\x00', '\x08',
-        '\x00', '\x00', '\x00', '\x07',
-        '\x00', '\x00', '\x00', '\x00',
-        '\x00', '\x00', '\x00', '\x01',
-        '\x00', '\x00', '\x00', '\x07'};
+    auto encoded =
+     std::vector<char>{'\x00', '\x00', '\x00', '\x08', '\x00', '\x00', '\x00',
+                       '\x07', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00',
+                       '\x00', '\x01', '\x00', '\x00', '\x00', '\x07'};
 
     WHEN("Extract codec header from iterator")
     {
-      const auto header = mmtf::make_codec_header(encoded.begin(), encoded.end());
+      const auto header =
+       mmtf::make_codec_header(encoded.begin(), encoded.end());
 
       THEN("Get codec header")
       {
         REQUIRE(header.strategy == 8);
         REQUIRE(header.length == 7);
-        REQUIRE((header.parameter == std::array{
-                                         static_cast<std::byte>(0),
-                                         static_cast<std::byte>(0),
-                                         static_cast<std::byte>(0),
-                                         static_cast<std::byte>(0)}));
+        REQUIRE((header.parameter == std::array{static_cast<std::byte>(0),
+                                                static_cast<std::byte>(0),
+                                                static_cast<std::byte>(0),
+                                                static_cast<std::byte>(0)}));
         REQUIRE(header.encoded_data.size() == 8);
-        REQUIRE(reinterpret_cast<const void *>(header.encoded_data.data()) == reinterpret_cast<const void *>(encoded.data() + 12));
+        REQUIRE(reinterpret_cast<const void*>(header.encoded_data.data()) ==
+                reinterpret_cast<const void*>(encoded.data() + 12));
       }
     }
   }
@@ -41,12 +40,10 @@ SCENARIO("Extract Codec from immutable data")
 {
   GIVEN("Encoded immutable array data")
   {
-    const auto encoded = std::array{
-        '\x00', '\x00', '\x00', '\x08',
-        '\x00', '\x00', '\x00', '\x07',
-        '\x00', '\x00', '\x00', '\x00',
-        '\x00', '\x00', '\x00', '\x01',
-        '\x00', '\x00', '\x00', '\x07'};
+    const auto encoded =
+     std::array{'\x00', '\x00', '\x00', '\x08', '\x00', '\x00', '\x00',
+                '\x07', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00',
+                '\x00', '\x01', '\x00', '\x00', '\x00', '\x07'};
 
     WHEN("Extract codec header from container")
     {
@@ -56,13 +53,13 @@ SCENARIO("Extract Codec from immutable data")
       {
         REQUIRE(header.strategy == 8);
         REQUIRE(header.length == 7);
-        REQUIRE((header.parameter == std::array{
-                                         static_cast<std::byte>(0),
-                                         static_cast<std::byte>(0),
-                                         static_cast<std::byte>(0),
-                                         static_cast<std::byte>(0)}));
+        REQUIRE((header.parameter == std::array{static_cast<std::byte>(0),
+                                                static_cast<std::byte>(0),
+                                                static_cast<std::byte>(0),
+                                                static_cast<std::byte>(0)}));
         REQUIRE(header.encoded_data.size() == 8);
-        REQUIRE(reinterpret_cast<const void *>(header.encoded_data.data()) == reinterpret_cast<const void *>(encoded.data() + 12));
+        REQUIRE(reinterpret_cast<const void*>(header.encoded_data.data()) ==
+                reinterpret_cast<const void*>(encoded.data() + 12));
       }
     }
   }
